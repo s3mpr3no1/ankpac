@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flashcards</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1 class="app-title">Flashcards</h1>
+      <div class="mode-toggle">
+        <button id="manageTab" class="mode-button active" type="button">Manage</button>
+        <button id="studyTab" class="mode-button" type="button">Study</button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <section id="manageSection" class="section section-manage">
+        <h2 class="section-title">Manage Cards</h2>
+
+        <div class="import-export-row">
+          <div class="import-controls">
+            <label for="importFile" class="import-label">Import CSV</label>
+            <input id="importFile" type="file" accept=".csv,text/csv" />
+            <button id="importButton" type="button" class="secondary-button">Load</button>
+          </div>
+          <div class="export-controls">
+            <button id="exportButton" type="button" class="secondary-button">Export CSV</button>
+          </div>
+        </div>
+
+        <form id="cardForm" class="card-form">
+          <div class="form-row">
+            <label for="frontInput">Front</label>
+            <textarea id="frontInput" name="front" rows="3" required></textarea>
+          </div>
+          <div class="form-row">
+            <label for="backInput">Back</label>
+            <textarea id="backInput" name="back" rows="3" required></textarea>
+          </div>
+          <div class="form-actions">
+            <button id="submitButton" type="submit">Add Card</button>
+            <button id="cancelEditButton" type="button" class="secondary-button hidden">Cancel Edit</button>
+          </div>
+        </form>
+
+        <div class="cards-list-container">
+          <h3 class="subheading">Your Cards</h3>
+          <p id="noCardsMessage" class="empty-message">You have no cards yet. Add one above to get started.</p>
+          <ul id="cardsList" class="cards-list">
+            <!-- Cards will be rendered here -->
+          </ul>
+        </div>
+      </section>
+
+      <section id="studySection" class="section section-study hidden">
+        <h2 class="section-title">Study</h2>
+        <p id="studyEmptyMessage" class="empty-message">
+          There are no cards to study yet. Add some cards in the Manage tab.
+        </p>
+
+        <div id="studyContent" class="study-content hidden">
+          <div class="study-card">
+            <div id="cardSideLabel" class="card-side-label">Front</div>
+            <div id="cardText" class="card-text"></div>
+          </div>
+
+          <div class="study-controls">
+            <button id="toggleSideButton" type="button">Show Answer</button>
+            <button id="nextCardButton" type="button">Next</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
