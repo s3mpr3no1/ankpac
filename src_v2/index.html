@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcard</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: system-ui, sans-serif;
+      padding: 1rem;
+      position: relative;
+    }
+    .load-csv {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.8rem;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+    }
+    .load-csv:hover {
+      background: #f5f5f5;
+    }
+    #csv-input {
+      display: none;
+    }
+    .card-text {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+    .buttons {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      padding: 1rem 0;
+    }
+    .buttons button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+    }
+    .buttons button:hover {
+      background: #f5f5f5;
+    }
+    .buttons.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <input type="file" id="csv-input" accept=".csv" />
+  <button type="button" class="load-csv" id="load-csv-btn">Load CSV</button>
+  <main class="card-text" id="card-text">Load cards to begin</main>
+  <nav class="buttons hidden" id="flip-row">
+    <button type="button" id="flip-btn">Flip card</button>
+  </nav>
+  <nav class="buttons hidden" id="grade-row">
+    <button type="button" data-grade="0">0</button>
+    <button type="button" data-grade="1">1</button>
+    <button type="button" data-grade="2">2</button>
+    <button type="button" data-grade="3">3</button>
+    <button type="button" data-grade="4">4</button>
+    <button type="button" data-grade="5">5</button>
+  </nav>
+  <script src="script.js"></script>
+  <script>
+    var cards = [];
+    var currentIndex = 0;
+    var showingFront = true;
+    var cardTextEl = document.getElementById('card-text');
+    var csvInput = document.getElementById('csv-input');
+    var flipRow = document.getElementById('flip-row');
+    var gradeRow = document.getElementById('grade-row');
+
+    function showCard() {
+      if (cards.length === 0) {
+        cardTextEl.textContent = 'Load cards to begin';
+        flipRow.classList.add('hidden');
+        gradeRow.classList.add('hidden');
+        return;
+      }
+      var card = cards[currentIndex];
+      cardTextEl.textContent = showingFront ? card.front : card.back;
+      flipRow.classList.toggle('hidden', !showingFront);
+      gradeRow.classList.toggle('hidden', showingFront);
+    }
+
+    document.getElementById('load-csv-btn').onclick = function () {
+      csvInput.click();
+    };
+
+    csvInput.onchange = function () {
+      var file = csvInput.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        cards = parseCSVToCards(e.target.result);
+        currentIndex = 0;
+        showingFront = true;
+        showCard();
+      };
+      reader.readAsText(file, 'UTF-8');
+      csvInput.value = '';
+    };
+
+    document.getElementById('flip-btn').onclick = function () {
+      if (cards.length === 0) return;
+      showingFront = false;
+      showCard();
+    };
+
+    gradeRow.addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-grade]');
+      if (!btn || cards.length === 0) return;
+      var grade = parseInt(btn.getAttribute('data-grade'), 10);
+      var card = cards[currentIndex];
+      cards.splice(currentIndex, 1);
+      cards.push(card);
+      showingFront = true;
+      showCard();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (cards.length === 0) return;
+      if (e.key === ' ') {
+        e.preventDefault();
+        if (showingFront) document.getElementById('flip-btn').click();
+      } else if (showingFront === false && e.key >= '0' && e.key <= '5') {
+        var gradeBtn = gradeRow.querySelector('button[data-grade="' + e.key + '"]');
+        if (gradeBtn) gradeBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>
