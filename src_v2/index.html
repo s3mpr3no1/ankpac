@@ -175,7 +175,12 @@
       if (cards.length === 0 || currentIndex < 0) return;
       if (e.key === ' ') {
         e.preventDefault();
-        if (showingFront && isCardDue(cards[currentIndex])) document.getElementById('flip-btn').click();
+        if (showingFront && isCardDue(cards[currentIndex])) {
+          document.getElementById('flip-btn').click();
+        } else if (!showingFront) {
+          var grade4 = gradeRow.querySelector('button[data-grade="4"]');
+          if (grade4) grade4.click();
+        }
       } else if (showingFront === false && e.key >= '0' && e.key <= '5') {
         var gradeBtn = gradeRow.querySelector('button[data-grade="' + e.key + '"]');
         if (gradeBtn) gradeBtn.click();
