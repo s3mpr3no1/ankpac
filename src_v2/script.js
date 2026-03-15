@@ -30,6 +30,32 @@ function parseCSVToCards(csvText) {
   return cards;
 }
 
+function escapeCSVField(str) {
+  if (str === null || str === undefined) return '""';
+  var s = String(str);
+  if (/[",\r\n]/.test(s)) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
+function cardsToCSV(cards) {
+  var header = 'front,back,interval,repetition,ease,dueDate';
+  var lines = [header];
+  for (var i = 0; i < cards.length; i++) {
+    var c = cards[i];
+    lines.push(
+      escapeCSVField(c.front) + ',' +
+      escapeCSVField(c.back) + ',' +
+      c.interval + ',' +
+      c.repetition + ',' +
+      c.ease + ',' +
+      c.dueDate
+    );
+  }
+  return lines.join('\n');
+}
+
 function parseCSVLine(line) {
   var out = [];
   var i = 0;

@@ -16,9 +16,6 @@
       position: relative;
     }
     .load-csv {
-      position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
       padding: 0.25rem 0.5rem;
       font-size: 0.8rem;
       border: 1px solid #ccc;
@@ -27,6 +24,16 @@
     }
     .load-csv:hover {
       background: #f5f5f5;
+    }
+    .top-buttons {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+    .top-buttons .hidden {
+      display: none;
     }
     #csv-input {
       display: none;
@@ -62,7 +69,10 @@
 </head>
 <body>
   <input type="file" id="csv-input" accept=".csv" />
-  <button type="button" class="load-csv" id="load-csv-btn">Load CSV</button>
+  <div class="top-buttons">
+    <button type="button" class="load-csv hidden" id="export-deck-btn">Export deck</button>
+    <button type="button" class="load-csv" id="load-csv-btn">Load CSV</button>
+  </div>
   <main class="card-text" id="card-text">Load cards to begin</main>
   <nav class="buttons hidden" id="flip-row">
     <button type="button" id="flip-btn">Flip card</button>
@@ -85,13 +95,17 @@
     var flipRow = document.getElementById('flip-row');
     var gradeRow = document.getElementById('grade-row');
 
+    var exportDeckBtn = document.getElementById('export-deck-btn');
+
     function showCard() {
       if (cards.length === 0) {
         cardTextEl.textContent = 'Load cards to begin';
         flipRow.classList.add('hidden');
         gradeRow.classList.add('hidden');
+        exportDeckBtn.classList.add('hidden');
         return;
       }
+      exportDeckBtn.classList.remove('hidden');
       if (currentIndex < 0 || currentIndex >= cards.length || !isCardDue(cards[currentIndex])) {
         cardTextEl.textContent = 'No cards due';
         flipRow.classList.add('hidden');
@@ -106,6 +120,18 @@
 
     document.getElementById('load-csv-btn').onclick = function () {
       csvInput.click();
+    };
+
+    exportDeckBtn.onclick = function () {
+      if (cards.length === 0) return;
+      var csv = cardsToCSV(cards);
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'deck.csv';
+      a.click();
+      URL.revokeObjectURL(url);
     };
 
     csvInput.onchange = function () {
