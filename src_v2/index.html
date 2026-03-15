@@ -92,6 +92,12 @@
         gradeRow.classList.add('hidden');
         return;
       }
+      if (currentIndex < 0 || currentIndex >= cards.length || !isCardDue(cards[currentIndex])) {
+        cardTextEl.textContent = 'No cards due';
+        flipRow.classList.add('hidden');
+        gradeRow.classList.add('hidden');
+        return;
+      }
       var card = cards[currentIndex];
       cardTextEl.textContent = showingFront ? card.front : card.back;
       flipRow.classList.toggle('hidden', !showingFront);
@@ -108,7 +114,7 @@
       var reader = new FileReader();
       reader.onload = function (e) {
         cards = parseCSVToCards(e.target.result);
-        currentIndex = 0;
+        currentIndex = findNextDueIndex(cards, 0);
         showingFront = true;
         showCard();
       };
@@ -117,27 +123,33 @@
     };
 
     document.getElementById('flip-btn').onclick = function () {
-      if (cards.length === 0) return;
+      if (cards.length === 0 || currentIndex < 0 || !isCardDue(cards[currentIndex])) return;
       showingFront = false;
       showCard();
     };
 
     gradeRow.addEventListener('click', function (e) {
       var btn = e.target.closest('button[data-grade]');
-      if (!btn || cards.length === 0) return;
+      if (!btn || cards.length === 0 || currentIndex < 0) return;
       var grade = parseInt(btn.getAttribute('data-grade'), 10);
       var card = cards[currentIndex];
+      var result = supermemo(card.interval, card.repetition, card.ease, grade);
+      card.interval = result.interval;
+      card.repetition = result.repetition;
+      card.ease = result.ease;
+      card.dueDate = Date.now() + result.interval * 24 * 60 * 60 * 1000;
       cards.splice(currentIndex, 1);
       cards.push(card);
+      currentIndex = findNextDueIndex(cards, currentIndex);
       showingFront = true;
       showCard();
     });
 
     document.addEventListener('keydown', function (e) {
-      if (cards.length === 0) return;
+      if (cards.length === 0 || currentIndex < 0) return;
       if (e.key === ' ') {
         e.preventDefault();
-        if (showingFront) document.getElementById('flip-btn').click();
+        if (showingFront && isCardDue(cards[currentIndex])) document.getElementById('flip-btn').click();
       } else if (showingFront === false && e.key >= '0' && e.key <= '5') {
         var gradeBtn = gradeRow.querySelector('button[data-grade="' + e.key + '"]');
         if (gradeBtn) gradeBtn.click();

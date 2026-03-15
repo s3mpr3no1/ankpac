@@ -72,13 +72,32 @@ function parseNum(val, defaultVal) {
   return isNaN(n) ? defaultVal : n;
 }
 
+function getEndOfToday() {
+  var d = new Date();
+  d.setHours(23, 59, 59, 999);
+  return d.getTime();
+}
+
+function isCardDue(card) {
+  return card.dueDate <= getEndOfToday();
+}
+
+function findNextDueIndex(cards, startIndex) {
+  if (cards.length === 0) return -1;
+  for (var i = 0; i < cards.length; i++) {
+    var idx = (startIndex + i) % cards.length;
+    if (isCardDue(cards[idx])) return idx;
+  }
+  return -1;
+}
+
 // initial values: interval=0, repetition=0, ease=2.5
 // item: SuperMemoItem
 // grade: 0-5
 // returns {interval, repetition, ease}
 
 function supermemo(interval, repetition, ease, grade) {
-   
+    console.log(`Starting Values: interval=${interval}, repetition=${repetition}, ease=${ease}, grade=${grade}`);
 
     if (grade >= 3) {
         if (repetition === 0) {
@@ -100,7 +119,7 @@ function supermemo(interval, repetition, ease, grade) {
     if (ease < 1.3) {
         ease = 1.3;
     }
-
+    console.log(`Ending Values: interval=${interval}, repetition=${repetition}, ease=${ease}, grade=${grade}`);
     return {
         interval,
         repetition,
