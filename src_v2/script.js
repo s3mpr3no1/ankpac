@@ -111,7 +111,7 @@ function supermemo(interval, repetition, ease, grade) {
         repetition += 1;
     } else {
         repetition = 0; 
-        interval = 1
+        interval = 0;
     }
 
     ease = ease + (0.1 - ( 5 - grade) * (0.08 + (5 - grade) * 0.02));
